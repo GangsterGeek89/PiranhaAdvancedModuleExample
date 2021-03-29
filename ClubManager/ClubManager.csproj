@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RazorLangVersion>3.0</RazorLangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Piranha" Version="9.0.1" />
+    <PackageReference Include="Piranha.AspNetCore" Version="9.0.1" />
+    <PackageReference Include="Piranha.AspNetCore.Identity" Version="9.0.0" />
+    <PackageReference Include="Piranha.AttributeBuilder" Version="9.0.1" />
+    <PackageReference Include="Piranha.Manager" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="assets\dist\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="assets\dist\js\clubpagelist.js" />
+    <None Remove="assets\dist\js\ClubPermissions.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Regions\" />
+    <Folder Include="Models\ViewModels\" />
+  </ItemGroup>
+
+</Project>

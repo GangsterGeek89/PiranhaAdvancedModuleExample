@@ -1,0 +1,114 @@
+﻿@page "~/manager/clubmanager"
+@model ClubPageListViewModel
+@inject ManagerLocalizer Localizer
+@{
+    ViewBag.Title = Localizer.Page["Club Pages"];
+    ViewBag.MenuItem = "Club Pages";
+}
+
+
+@section script{
+    <script src="@Url.Content(Piranha.Manager.Editor.EditorScripts.MainScriptUrl)"></script>
+    <script src="@Url.Content(Piranha.Manager.Editor.EditorScripts.EditorScriptUrl)"></script>
+
+    <script src="~/manager/ClubManager/js/clubpagelist.js"></script>
+    <script src="~/manager/ClubManager/js/ClubPermissions.js"></script>
+
+    <script type="text/javascript">
+        piranha.clubpermissions.load();
+        piranha.clubpagelist.load();        
+    </script>
+}
+
+@section partials
+{
+    @foreach (var action in Piranha.Manager.Actions.Toolbars.PageList)
+    {
+        if (!string.IsNullOrWhiteSpace(action.PartialView))
+        {
+            <partial name="@action.PartialView" />
+        }
+    }
+}
+
+<div id="clubpagelist">
+    <div class="top">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">@Localizer.Menu["Content"]</li>
+                <li class="breadcrumb-item active" aria-current="page">@Localizer.Menu["Club Pages"]</li>
+            </ol>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="top-nav">
+                @foreach (var action in Piranha.Manager.Actions.Toolbars.PageList)
+                {
+                    <partial name="@action.ActionView" />}
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid app" :class="{ ready: !loading }">
+        <div class="row">
+            <div class="col">
+                <div class="sitemap">
+                    <ol>
+                        <li v-if="clubMainPage != null">
+                            <div class="sitemap-item">
+                                <div class="handle"><i class="fas fa-globe"></i></div>
+                                <div class="link">
+                                    <a v-if="piranha.clubpermissions.clubPages.edit" :href="piranha.baseUrl + clubMainPage.editUrl + clubMainPage.id" >{{ clubMainPage.title }} <small style="display:none">(<code>{{ clubMainPage.slug }}</code>)</small></a>
+                                    <span v-else class="title">{{ clubMainPage.title }} <small style="display:none">(<code>{{ clubMainPage.slug }}</code>)</small></span>
+                                </div>
+                                <div>
+                                    <div v-if="piranha.clubpermissions.clubPages.add" class="btn-group" role="group">
+                                        <button id="pageGroup" type="button" class="btn btn-sm btn-primary btn-labeled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-plus"></i>
+                                            @Localizer.Page["Add page"]
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="pageGroup">
+                                            <a class="dropdown-item" :href="piranha.baseUrl + type.addUrl + clubMainPage.siteId + '/' + type.id" v-for="type in pageTypes">{{ type.title }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sitemap sitemap-container dd" data-id="{ clubMainPage.siteId }">
+                                <ol class="dd-list">
+                                    <li class="dd-item" v-for="item in clubMainPage.items" v-bind:key="item.id" v-bind:item="item">
+                                        <div class="sitemap-item">
+                                            <div class="handle dd-handle"><i class="fas fa-ellipsis-v"></i></div>
+                                            <div class="link">
+                                                @*<span class="actions">
+                                                    <a v-if="item.items.length > 0 && item.isExpanded" v-on:click.prevent="toggleItem(item)" class="expand" href="#"><i class="fas fa-minus"></i></a>
+                                                    <a v-if="item.items.length > 0 && !item.isExpanded" v-on:click.prevent="toggleItem(item)" class="expand" href="#"><i class="fas fa-plus"></i></a>
+                                                </span>*@
+                                                <a v-if="piranha.clubpermissions.clubPages.edit" :href="piranha.baseUrl + item.editUrl + item.id">
+                                                    <span v-html="item.title"></span>
+                                                    <span v-if="item.isRestricted" class="icon-restricted text-secondary small"><i class="fas fa-lock"></i></span>
+                                                    <span v-if="item.status" class="badge badge-info">{{ item.status }}</span>
+                                                    <span v-if="item.isCopy" class="badge badge-warning">{{ piranha.resources.texts.copy }}</span>
+                                                </a>
+                                                <span v-else class="title">
+                                                    <span v-html="item.title"></span>
+                                                    <span v-if="item.isRestricted" class="icon-restricted text-secondary small"><i class="fas fa-lock"></i></span>
+                                                    <span v-if="item.status" class="badge badge-info">{{ item.status }}</span>
+                                                    <span v-if="item.isCopy" class="badge badge-warning">{{ piranha.resources.texts.copy }}</span>
+                                                </span>
+                                            </div>
+                                            <div class="type d-none d-md-block">{{ item.typeName }}</div>
+                                            <div class="date d-none d-lg-block">{{ item.published }}</div>
+                                            <div class="actions">
+                                                <a v-if="piranha.clubpermissions.clubPages.delete" v-on:click.prevent="piranha.pagelist.remove(item.id)" class="danger" href="#"><i class="fas fa-trash"></i></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
