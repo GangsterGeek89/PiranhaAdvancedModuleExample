@@ -10,20 +10,25 @@ using Piranha.AspNetCore.Identity.SQLite;
 using Piranha.Data.EF.SQLite;
 using Piranha.Manager.Editor;
 using ClubManager;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace ClubSite
 {
     public class Startup
     {
         private readonly IConfiguration _config;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
         /// <summary>
         /// Default constructor.
         /// </summary>
         /// <param name="configuration">The current configuration</param>
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment whe)
         {
             _config = configuration;
+            webHostEnvironment = whe;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -56,6 +61,12 @@ namespace ClubSite
                     o.UsePermission("WebUser", "Web User");
                 });
                  */
+            });
+
+            services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
+            {
+                var libPath = Path.GetFullPath(Path.Combine(webHostEnvironment.ContentRootPath, "..", "ClubManager"));
+                options.FileProviders.Add(new PhysicalFileProvider(libPath));
             });
         }
 

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Piranha;
 using Piranha.AspNetCore.Identity.Data;
 using Piranha.Manager;
+using Piranha.Manager.Models;
 using Piranha.Manager.Models.Content;
 using Piranha.Manager.Services;
 using Piranha.Models;
@@ -99,7 +100,7 @@ namespace ClubManager.Controllers
                 Published = MainClubPageSiteMapItem.Published.HasValue ? MainClubPageSiteMapItem.Published.Value.ToString("yyyy-MM-dd") : null,
                 Status = drafts.Contains(MainClubPageSiteMapItem.Id) ? _localizer.General[ClubPageListModel.MainClubPage.Draft] :
                     !MainClubPageSiteMapItem.Published.HasValue ? _localizer.General[ClubPageListModel.MainClubPage.Unpublished] : "",
-                EditUrl = "manager/page/edit/",
+                EditUrl = "manager/clubpage/edit/",
                 IsExpanded = false,
                 IsCopy = MainClubPageSiteMapItem.OriginalPageId.HasValue,
                 IsRestricted = MainClubPageSiteMapItem.Permissions.Count > 0,
@@ -112,6 +113,19 @@ namespace ClubManager.Controllers
 
 
             return ClubModel;
+        }
+
+        /// <summary>
+        /// Gets the page with the given id.
+        /// </summary>
+        /// <param name="id">The unique id</param>
+        /// <returns>The page edit model</returns>
+        [Route("{id:Guid}")]
+        [HttpGet]
+        [Authorize(Policy = Permissions.ClubEditorEdit)]
+        public async Task<PageEditModel> Get(Guid id)
+        {
+            return await _service.GetById(id);
         }
 
         private List<ClubPage> MapRecursive(Guid siteId, SitemapItem parentItem, int level, int expandedLevels, IEnumerable<Guid> drafts)
@@ -129,7 +143,7 @@ namespace ClubManager.Controllers
                     Published = item.Published.HasValue ? item.Published.Value.ToString("yyyy-MM-dd") : null,
                     Status = drafts.Contains(item.Id) ? _localizer.General[ClubPageListModel.ClubPage.Draft] :
                     !item.Published.HasValue ? _localizer.General[ClubPageListModel.ClubPage.Unpublished] : "",
-                    EditUrl = "manager/page/edit/",
+                    EditUrl = "manager/clubpage/edit/",
                     IsExpanded = level < expandedLevels,
                     IsCopy = item.OriginalPageId.HasValue,
                     IsRestricted = item.Permissions.Count > 0,
